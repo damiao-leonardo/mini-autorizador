@@ -13,6 +13,6 @@ public interface CardRepository extends JpaRepository<Card, Integer> {
    boolean existsByCardNumber(String cardNumber);
 
    @Query(value = "SELECT c.availableBalance FROM Card c WHERE c.cardNumber = :cardNumber")
-   Optional<BigDecimal> findBalanceByNumber(@Param("cardNumber") String cardNumber);
+   Optional<BigDecimal> findAvailableBalanceByNumber(@Param("cardNumber") String cardNumber);
 
 }

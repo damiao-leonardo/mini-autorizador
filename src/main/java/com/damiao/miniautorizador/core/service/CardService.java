@@ -37,7 +37,7 @@ public class CardService {
     }
 
     public BigDecimal getAvailableBalance(String numeroCartao) {
-        return cardRepository.findBalanceByNumber(numeroCartao)
+        return cardRepository.findAvailableBalanceByNumber(numeroCartao)
            .orElseThrow(() -> new CardNotFoundException(Constant.CARD_NOT_FOUND));
     }
 
