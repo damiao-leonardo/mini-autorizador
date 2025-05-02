@@ -31,12 +31,26 @@ public class CardController {
 
     private final CardService cardService;
 
-    @Operation(summary = "Cria um novo cartão")
+    @Operation(
+            summary = "Cria um novo cartão",
+            description = "Cria um novo cartão com número e senha. Caso o cartão já exista, retorna erro."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Cartão criado com sucesso",
-                    content = @Content(schema = @Schema(implementation = CardResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos", content = @Content),
-            @ApiResponse(responseCode = "409", description = "Cartão já existe", content = @Content)
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Cartão criado com sucesso",
+                    content = @Content(schema = @Schema(implementation = CardResponseDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Requisição não autorizada",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "422",
+                    description = "Cartão já existe na base de dados",
+                    content = @Content
+            )
     })
     @PostMapping
     public ResponseEntity<CardResponseDto> createCard(
@@ -49,17 +63,27 @@ public class CardController {
         return new ResponseEntity<>(cardService.createCard(cardDto), HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Consulta o saldo de um cartão")
+
+    @Operation(
+            summary = "Consulta o saldo de um cartão",
+            description = "Retorna o saldo disponível de um cartão a partir do número informado."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Saldo retornado com sucesso",
-                    content = @Content(schema = @Schema(implementation = BigDecimal.class))),
-            @ApiResponse(responseCode = "404", description = "Cartão não encontrado", content = @Content)
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Consulta realizada com sucesso",
+                    content = @Content(schema = @Schema(implementation = CardResponseDto.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Cartão não encontrado na base de dados",
+                    content = @Content
+            )
     })
     @GetMapping("/{numeroCartao}")
-    public ResponseEntity<BigDecimal> getBalance(
+    public ResponseEntity<BigDecimal> getAvailableBalance(
             @Parameter(description = "Número do cartão", required = true)
             @PathVariable("numeroCartao") String numeroCartao) {
-
         return new ResponseEntity<>(cardService.getAvailableBalance(numeroCartao), HttpStatus.OK);
     }
 }
