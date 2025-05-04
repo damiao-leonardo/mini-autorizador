@@ -7,7 +7,7 @@ import com.damiao.miniautorizador.core.model.mapper.CardMapper;
 import com.damiao.miniautorizador.core.repository.CardRepository;
 import com.damiao.miniautorizador.exceptions.CardNotFoundException;
 import com.damiao.miniautorizador.exceptions.DuplicateCardException;
-import com.damiao.miniautorizador.util.Constant;
+import com.damiao.miniautorizador.util.CardMessages;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -128,6 +128,6 @@ class CardServiceTest {
     void ThrowExceptionWhenCardNotFound() {
         // Act & Assert
         CardNotFoundException ex = assertThrows(CardNotFoundException.class, () -> cardService.getAvailableBalance(CARD_NUMBER));
-        assertEquals(Constant.CARD_NOT_FOUND, ex.getMessage());
+        assertEquals(CardMessages.CARD_NOT_FOUND, ex.getMessage());
     }
 }
