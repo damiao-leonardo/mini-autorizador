@@ -9,13 +9,13 @@ import com.damiao.miniautorizador.exceptions.CardNotFoundException;
 import com.damiao.miniautorizador.exceptions.DuplicateCardException;
 import com.damiao.miniautorizador.util.CardMessages;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -41,9 +41,6 @@ class CardServiceTest {
     @Mock
     private CardRepository cardRepository;
 
-    @Mock
-    private BCryptPasswordEncoder passwordEncoder;
-
     @Spy
     private CardMapper cardMapper;
 
@@ -65,25 +62,21 @@ class CardServiceTest {
     @BeforeEach
     public void setup(){
         ReflectionTestUtils.setField(cardService, "availableBalanceInitial", new BigDecimal("500.00"));
-        cardDto = CardDto.builder()
-                .numeroCartao(CARD_NUMBER)
-                .senha(CARD_PASSWORD)
-                .build();
 
-         card = Card.builder()
-                .cardNumber(CARD_NUMBER)
-                .cardPassword(CARD_PASSWORD)
-                .availableBalance(BigDecimal.valueOf(500))
-                .build();
+        cardDto = new CardDto();
+        cardDto.setNumeroCartao(CARD_NUMBER);
+        cardDto.setSenha(CARD_PASSWORD);
 
-        cardResponseDto = CardResponseDto.builder()
-                .numeroCartao(CARD_NUMBER)
-                .senha(CARD_PASSWORD)
-                .build();
+        card = new Card();
+        card.setCardNumber(CARD_NUMBER);
+        card.setCardPassword(CARD_PASSWORD);
+
+        cardResponseDto = new CardResponseDto(CARD_PASSWORD,CARD_NUMBER);
+
     }
 
-    @Test
-    void createCardSuccessfully() {
+    @DisplayName("Deve criar o cartão com sucesso")
+    void shouldCreateCardSuccessfully() {
         // Arrange
         when(cardMapper.cardDtoToCard(cardDto)).thenReturn(card);
         when(cardRepository.existsByCardNumber(cardDto.getNumeroCartao())).thenReturn(false);
@@ -101,7 +94,8 @@ class CardServiceTest {
     }
 
     @Test
-    void throwExceptionWhenCardAlreadyExists() {
+    @DisplayName("Deve lançar exceção quando o cartão já existir")
+    void shouldThrowExceptionWhenCardAlreadyExists() {
         // Arrange
         when(cardMapper.cardDtoToCard(cardDto)).thenReturn(card);
         when(cardRepository.existsByCardNumber(cardDto.getNumeroCartao())).thenReturn(true);
@@ -112,7 +106,8 @@ class CardServiceTest {
     }
 
     @Test
-    void returnAvailableBalanceWhenCardExists() {
+    @DisplayName("Deve retornar o saldo disponível quando o cartão existir")
+    void shouldReturnAvailableBalanceWhenCardExists() {
         // Arrange
         BigDecimal expecteAvailabledBalance = new BigDecimal("100.00");
         when(cardRepository.findAvailableBalanceByNumber(CARD_NUMBER)).thenReturn(Optional.of(expecteAvailabledBalance));
@@ -125,7 +120,8 @@ class CardServiceTest {
     }
 
     @Test
-    void ThrowExceptionWhenCardNotFound() {
+    @DisplayName("Deve lançar exceção quando o cartão não for encontrado")
+    void shouldThrowExceptionWhenCardNotFound() {
         // Act & Assert
         CardNotFoundException ex = assertThrows(CardNotFoundException.class, () -> cardService.getAvailableBalance(CARD_NUMBER));
         assertEquals(CardMessages.CARD_NOT_FOUND, ex.getMessage());
