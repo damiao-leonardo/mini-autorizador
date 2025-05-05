@@ -32,9 +32,11 @@ public class Card implements Serializable {
     private String cardPassword;
     @Column(name = "available_balance", nullable = false)
     private BigDecimal availableBalance;
-    @Version
+
     @Column(name = "record_version")
+    @Version
     private Integer recordVersion;
+
     @Embedded
     private Audit audit;
 }
