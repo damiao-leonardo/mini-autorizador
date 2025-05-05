@@ -23,39 +23,31 @@ public class TransactionService {
     private final CompositeTransactionValidator compositeValidator;
 
     @Transactional
-    @Retryable(
-            retryFor = StaleObjectStateException.class,
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 200, multiplier = 2)
-    )
+    @Retryable(retryFor = StaleObjectStateException.class, backoff = @Backoff(delay = 500))
     public String processTransaction(TransactionDto transactionDto) {
-
         try {
             Card card = findCardByNumber(transactionDto.getNumeroCartao());
-            validateTransaction(transactionDto, card);
-            applyTransaction(transactionDto, card);
-            log.info("Transação concluída com sucesso para o cartão {}", card.getCardNumber());
+            compositeValidator.execute(transactionDto, card);
+            subtractAvailableBalance(transactionDto, card);
+            cardRepository.save(card);
             return CardMessages.OK;
         } catch (TransactionException e) {
-            log.warn("Falha na transação: {}", e.getMessage());
+            log.warn("Transaction error: Não foi possível realizar a transação: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Erro inesperado ao processar a transação: {}", e.getMessage(), e);
-            throw new TransactionException("Erro inesperado ao realizar a transação: " + e.getMessage());
+            log.error("Transaction error: Erro ao realizar a transação: {}", e.getMessage(), e);
+            throw new TransactionException("Erro inesperado ao realizar a transação!" + e.getMessage());
         }
+    }
+
+    private void subtractAvailableBalance(TransactionDto transactionDto, Card card) {
+        card.setAvailableBalance(card.getAvailableBalance().subtract(transactionDto.getValor()));
     }
 
     private Card findCardByNumber(String cardNumber) {
         return cardRepository.findByCardNumber(cardNumber);
     }
 
-    private void validateTransaction(TransactionDto transactionDto, Card card) {
-        compositeValidator.execute(transactionDto, card);
-    }
 
-    private void applyTransaction(TransactionDto transactionDto, Card card) {
-        card.setAvailableBalance(card.getAvailableBalance().subtract(transactionDto.getValor()));
-        cardRepository.save(card);
-    }
 
 }
