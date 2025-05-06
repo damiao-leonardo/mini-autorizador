@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("cartoes")
@@ -60,7 +62,11 @@ public class CardController {
                     content = @Content(schema = @Schema(implementation = CardDto.class))
             )
             @Valid @RequestBody CardDto cardDto) {
-        return new ResponseEntity<>(cardService.createCard(cardDto), HttpStatus.CREATED);
+        log.info("Requisição para criar cartão recebida: numeroCartao={}", cardDto.getNumeroCartao());
+        CardResponseDto response = cardService.createCard(cardDto);
+        log.info("Cartão criado com sucesso: numeroCartao={}", response.getNumeroCartao());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+
     }
 
 
@@ -84,6 +90,10 @@ public class CardController {
     public ResponseEntity<BigDecimal> getAvailableBalance(
             @Parameter(description = "Número do cartão", required = true)
             @PathVariable("numeroCartao") String numeroCartao) {
-        return new ResponseEntity<>(cardService.getAvailableBalance(numeroCartao), HttpStatus.OK);
+
+        log.info("Consultando saldo do cartão: numeroCartao={}", numeroCartao);
+        BigDecimal saldo = cardService.getAvailableBalance(numeroCartao);
+        log.info("Saldo retornado com sucesso para numeroCartao={}: saldo={}", numeroCartao, saldo);
+        return new ResponseEntity<>(saldo, HttpStatus.OK);
     }
 }
