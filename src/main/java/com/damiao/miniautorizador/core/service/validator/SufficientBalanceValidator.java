@@ -18,7 +18,7 @@ public class SufficientBalanceValidator implements TransactionValidator {
     public void execute(TransactionDto transactionDto, Card card) throws TransactionException {
         BigDecimal availableBalanceCurrent = Optional.ofNullable(card.getAvailableBalance())
                 .filter(availableBalance -> availableBalance.compareTo(transactionDto.getValor()) >= 0)
-                .orElseThrow(() -> new TransactionException(ResponseApiEnum.INSUFFICIENT_BALANCE.name()));
+                .orElseThrow(() -> new TransactionException(ResponseApiEnum.SALDO_INSUFICIENTE.name()));
 
         log.info("Transaction validated successfully: sufficient balance = {}", availableBalanceCurrent);
     }

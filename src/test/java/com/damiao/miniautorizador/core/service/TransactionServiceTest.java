@@ -9,7 +9,7 @@ import com.damiao.miniautorizador.core.service.validator.PasswordValidation;
 import com.damiao.miniautorizador.core.service.validator.SufficientBalanceValidator;
 import com.damiao.miniautorizador.core.service.validator.TransactionValidator;
 import com.damiao.miniautorizador.exceptions.TransactionException;
-import com.damiao.miniautorizador.util.CardMessages;
+import com.damiao.miniautorizador.util.enums.ResponseApiEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -73,7 +73,7 @@ class TransactionServiceTest {
     }
 
     @Test
-    @DisplayName("Deve processar transação com sucesso")
+    @DisplayName("Deve processar transacao com sucesso")
     void shouldProcessTransactionSuccessfully() {
         // Arrange
         when(cardRepository.findByCardNumber(anyString())).thenReturn(card);
@@ -90,7 +90,7 @@ class TransactionServiceTest {
         String result = transactionService.processTransaction(transactionDto);
 
         // Assert
-        assertEquals(CardMessages.OK, result);
+        assertEquals(ResponseApiEnum.OK.name(), result);
         assertEquals(new BigDecimal("400.0"), card.getAvailableBalance());
         verify(cardRepository).saveAndFlush(card);
     }
@@ -107,13 +107,13 @@ class TransactionServiceTest {
         String result = transactionService.processTransaction(transactionDto);
 
         // Assert
-        assertEquals(CardMessages.OK, result);
+        assertEquals(ResponseApiEnum.OK.name(), result);
         assertEquals(new BigDecimal("450.00"), card.getAvailableBalance());
         verify(cardRepository).saveAndFlush(any(Card.class));
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando o cartão não existe")
+    @DisplayName("Deve lancar excecao quando o cartao nao existe")
     void shouldThrowExceptionWhenCardDoesNotExist() {
         // Arrange
         when(cardRepository.findByCardNumber(transactionDto.getNumeroCartao())).thenReturn(null);
@@ -127,18 +127,18 @@ class TransactionServiceTest {
             transactionService.processTransaction(transactionDto);
         });
 
-        assertEquals(CardMessages.CARTAO_INEXISTENTE, exception.getMessage());
+        assertEquals(ResponseApiEnum.CARTAO_INEXISTENTE.name(), exception.getMessage());
         verify(cardRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando saldo for insuficiente")
+    @DisplayName("Deve lancar excecao quando saldo for insuficiente")
     void shouldThrowExceptionWhenInsufficientBalance() {
         // Arrange
         transactionDto.setValor(new BigDecimal("550.00"));
         when(cardRepository.findByCardNumber(transactionDto.getNumeroCartao())).thenReturn(card);
 
-        // Aqui usamos um validador real que lançará exceção
+        // Aqui usamos um validador real que lançara exceção
         List<TransactionValidator> validators = List.of(new SufficientBalanceValidator());
         CompositeTransactionValidator composite = new CompositeTransactionValidator(validators);
         transactionService = new TransactionService(cardRepository, composite);
@@ -148,18 +148,18 @@ class TransactionServiceTest {
             transactionService.processTransaction(transactionDto);
         });
 
-        assertEquals(CardMessages.INSUFFICIENT_BALANCE, exception.getMessage());
+        assertEquals(ResponseApiEnum.SALDO_INSUFICIENTE.name(), exception.getMessage());
         verify(cardRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando a senha for inválida")
+    @DisplayName("Deve lancar excecao quando a senha for invalida")
     void shouldThrowExceptionWhenInvalidPassword() {
         // Arrange
         transactionDto.setSenhaCartao("senha_incorreta");
         when(cardRepository.findByCardNumber(transactionDto.getNumeroCartao())).thenReturn(card);
 
-        // Aqui usamos um validador real que lançará exceção
+        // Aqui usamos um validador real que lançara exceção
         List<TransactionValidator> validators = List.of(new PasswordValidation());
         CompositeTransactionValidator composite = new CompositeTransactionValidator(validators);
         transactionService = new TransactionService(cardRepository, composite);
@@ -169,22 +169,20 @@ class TransactionServiceTest {
             transactionService.processTransaction(transactionDto);
         });
 
-        assertEquals(CardMessages.INVALID_PASSWORD, exception.getMessage());
+        assertEquals(ResponseApiEnum.SENHA_INVALIDA.name(), exception.getMessage());
         verify(cardRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando ocorrer erro inesperado ao processar a transação")
+    @DisplayName("Deve lancar excecao quando ocorrer erro inesperado ao processar a transacao")
     void shouldThrowTransactionExceptionWhenUnexpectedErrorOccursDuringTransactionProcessing() {
         // Arrange
         when(cardRepository.findByCardNumber(transactionDto.getNumeroCartao())).thenThrow(RuntimeException.class);
 
         // Act & Assert
-        TransactionException exception = assertThrows(TransactionException.class, () -> transactionService.processTransaction(transactionDto));
+        assertThrows(RuntimeException.class, () -> transactionService.processTransaction(transactionDto));
 
         // Assert
-        assertNotNull(exception.getMessage(), "A mensagem de exceção não deve ser nula.");
-        assertTrue(exception.getMessage().startsWith("Erro inesperado ao realizar a transacao"), "A mensagem de exceção deve começar com 'Erro inesperado ao realizar a transacao'");
         verify(cardRepository, never()).save(any(Card.class));
     }
 

@@ -19,7 +19,7 @@ public class PasswordValidation implements TransactionValidator {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         Card validatedCard = Optional.ofNullable(card)
                 .filter(cardItem -> passwordEncoder.matches(transactionDto.getSenhaCartao(), cardItem.getCardPassword()))
-                .orElseThrow(() -> new TransactionException(ResponseApiEnum.INVALID_PASSWORD.name()));
+                .orElseThrow(() -> new TransactionException(ResponseApiEnum.SENHA_INVALIDA.name()));
 
         log.info("Transaction validated successfully: Card with number {} has correct password", validatedCard.getCardNumber());
     }

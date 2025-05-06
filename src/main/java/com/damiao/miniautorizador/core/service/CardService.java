@@ -38,7 +38,7 @@ public class CardService {
 
     public BigDecimal getAvailableBalance(String numeroCartao) {
         return cardRepository.findAvailableBalanceByNumber(numeroCartao)
-           .orElseThrow(() -> new CardNotFoundException(ResponseApiEnum.CARD_NOT_FOUND.name()));
+           .orElseThrow(() -> new CardNotFoundException(ResponseApiEnum.CARTAO_NAO_ENCONTRADO.getMessage()));
     }
 
     private void verifyCardDoesNotExist(CardDto cardDto) {

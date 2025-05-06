@@ -7,7 +7,7 @@ import com.damiao.miniautorizador.core.model.mapper.CardMapper;
 import com.damiao.miniautorizador.core.repository.CardRepository;
 import com.damiao.miniautorizador.exceptions.CardNotFoundException;
 import com.damiao.miniautorizador.exceptions.DuplicateCardException;
-import com.damiao.miniautorizador.util.CardMessages;
+import com.damiao.miniautorizador.util.enums.ResponseApiEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,7 +75,8 @@ class CardServiceTest {
 
     }
 
-    @DisplayName("Deve criar o cartão com sucesso")
+    @Test
+    @DisplayName("Deve criar o cartao com sucesso")
     void shouldCreateCardSuccessfully() {
         // Arrange
         when(cardMapper.cardDtoToCard(cardDto)).thenReturn(card);
@@ -94,7 +95,7 @@ class CardServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando o cartão já existir")
+    @DisplayName("Deve lancar excecao quando o cartao ja existir")
     void shouldThrowExceptionWhenCardAlreadyExists() {
         // Arrange
         when(cardMapper.cardDtoToCard(cardDto)).thenReturn(card);
@@ -106,7 +107,7 @@ class CardServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar o saldo disponível quando o cartão existir")
+    @DisplayName("Deve retornar o saldo disponivel quando o cartao existir")
     void shouldReturnAvailableBalanceWhenCardExists() {
         // Arrange
         BigDecimal expecteAvailabledBalance = new BigDecimal("100.00");
@@ -120,10 +121,10 @@ class CardServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando o cartão não for encontrado")
+    @DisplayName("Deve lancar excecao quando o cartao nao for encontrado")
     void shouldThrowExceptionWhenCardNotFound() {
         // Act & Assert
         CardNotFoundException ex = assertThrows(CardNotFoundException.class, () -> cardService.getAvailableBalance(CARD_NUMBER));
-        assertEquals(CardMessages.CARD_NOT_FOUND, ex.getMessage());
+        assertEquals(ResponseApiEnum.CARTAO_NAO_ENCONTRADO.name(), ex.getMessage());
     }
 }

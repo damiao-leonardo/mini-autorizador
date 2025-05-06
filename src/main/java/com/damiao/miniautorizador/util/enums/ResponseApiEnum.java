@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ResponseApiEnum {
 
-  CARD_NOT_FOUND("Cartão não encontrado"),
-  INSUFFICIENT_BALANCE("Saldo insuficiente"),
-  INVALID_PASSWORD("Senha inválida"),
+  CARTAO_NAO_ENCONTRADO("Cartão não encontrado"),
+  SALDO_INSUFICIENTE("Saldo insuficiente"),
+  SENHA_INVALIDA("Senha inválida"),
   CARTAO_INEXISTENTE("Cartão inexistente"),
   OK("OK");
 
