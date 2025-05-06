@@ -125,6 +125,6 @@ class CardServiceTest {
     void shouldThrowExceptionWhenCardNotFound() {
         // Act & Assert
         CardNotFoundException ex = assertThrows(CardNotFoundException.class, () -> cardService.getAvailableBalance(CARD_NUMBER));
-        assertEquals(ResponseApiEnum.CARTAO_NAO_ENCONTRADO.name(), ex.getMessage());
+        assertEquals(ResponseApiEnum.CARTAO_NAO_ENCONTRADO.getMessage(), ex.getMessage());
     }
 }
