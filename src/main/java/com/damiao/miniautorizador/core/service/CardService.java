@@ -7,7 +7,7 @@ import com.damiao.miniautorizador.core.model.mapper.CardMapper;
 import com.damiao.miniautorizador.core.repository.CardRepository;
 import com.damiao.miniautorizador.exceptions.CardNotFoundException;
 import com.damiao.miniautorizador.exceptions.DuplicateCardException;
-import com.damiao.miniautorizador.util.CardMessages;
+import com.damiao.miniautorizador.util.enums.ResponseApiEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -38,7 +38,7 @@ public class CardService {
 
     public BigDecimal getAvailableBalance(String numeroCartao) {
         return cardRepository.findAvailableBalanceByNumber(numeroCartao)
-           .orElseThrow(() -> new CardNotFoundException(CardMessages.CARD_NOT_FOUND));
+           .orElseThrow(() -> new CardNotFoundException(ResponseApiEnum.CARD_NOT_FOUND.name()));
     }
 
     private void verifyCardDoesNotExist(CardDto cardDto) {
